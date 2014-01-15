@@ -1,0 +1,95 @@
+#!/usr/bin/perl -w
+
+use v5.14;
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Fatal qw( open );
+use Pod::Usage;
+
+my $DEBUG = 0 ;
+my $interface;
+my $daemon;
+my $help;
+
+my $period = 30; #seconds
+
+GetOptions( 
+	'd' => \$DEBUG,
+	'i=s' => \$interface,
+	'h|help|?' => \$help,
+);
+
+$SIG{ ALRM } = sub { 
+	die 'timeout detected waiting to finish!';
+	
+};
+alarm 60;
+
+pod2usage(-verbose => 2) if $help;
+
+if( ! defined( $interface ) ) {
+	say STDERR 'Error! Please specify an interface!';
+	pod2usage(-verbose => 1);
+	exit;
+}
+
+my $command = 'dhcdrop -t -i '.$interface;
+
+open my $cmd,'-|',$command;
+my $found = 0;
+while(<$cmd>) {
+	if( my ($rest) = ($_ =~ /^DHCP SRV:(.+)$/) ) {
+		say 'DHCP Server detected: Info: '.$rest;
+		$found++;
+	}
+	$DEBUG && say STDERR $_
+}
+if( $found ) {
+	say "found DHCP $found servers"
+}
+else {
+	$DEBUG && say 'no DHCP servers found'
+}
+close $cmd;
+
+if( $found ) {
+	exit 1;
+} 
+else {
+	exit 0;
+}
+
+__END__
+
+=head1 NAME
+
+dhcp_test -- scan for dhcp server in a periodic fashion, warn if found
+
+=head1 SYNOPSIS
+
+assign_ipv6_addresses_to_ldap.pl [ options ]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exit.
+
+=item B<-n>
+
+Dry run
+
+=item B<-d>
+
+Enable debug output
+
+=item B<-i INTERFACE>
+
+Specify which interface to use, mandatory
+
+=back
+

@@ -1,0 +1,6 @@
+Put something like this in your crontab
+
+message=`./dhcp_alarm -i eth0` >/tmp/dhcp_test.out 2>&1 || echo $message | mail -s'rogue DHCP server detected' your@email >/tmp/mail_dhcp.out 2>&1
+
+
+
