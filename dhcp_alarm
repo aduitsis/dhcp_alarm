@@ -67,11 +67,11 @@ __END__
 
 =head1 NAME
 
-dhcp_test -- scan for dhcp server in a periodic fashion, warn if found
+dhcp_alarm -- scan for dhcp server in a periodic fashion, warn if found
 
 =head1 SYNOPSIS
 
-assign_ipv6_addresses_to_ldap.pl [ options ]
+dhcp_alarm [options] 
 
 Returns 0 if no DHCP servers where found, 1 otherwise.
 
