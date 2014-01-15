@@ -12,6 +12,7 @@ my $DEBUG = 0 ;
 my $interface;
 my $daemon;
 my $help;
+my $dhcdrop = '/usr/local/sbin/dhcdrop';
 
 my $period = 30; #seconds
 
@@ -19,6 +20,7 @@ GetOptions(
 	'd' => \$DEBUG,
 	'i=s' => \$interface,
 	'h|help|?' => \$help,
+	'dhcdrop=s' => \$dhcdrop,
 );
 
 $SIG{ ALRM } = sub { 
@@ -35,7 +37,7 @@ if( ! defined( $interface ) ) {
 	exit;
 }
 
-my $command = 'dhcdrop -t -i '.$interface;
+my $command = $dhcdrop.' -t -i '.$interface;
 
 open my $cmd,'-|',$command;
 my $found = 0;
@@ -71,6 +73,8 @@ dhcp_test -- scan for dhcp server in a periodic fashion, warn if found
 
 assign_ipv6_addresses_to_ldap.pl [ options ]
 
+Returns 0 if no DHCP servers where found, 1 otherwise.
+
 =head1 OPTIONS
 
 =over 8
@@ -90,6 +94,10 @@ Enable debug output
 =item B<-i INTERFACE>
 
 Specify which interface to use, mandatory
+
+=item B< -dhcdrop <PATH TO DHCDROP>>
+
+Specify the full path of the dhcdrop command
 
 =back
 
